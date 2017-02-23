@@ -57,6 +57,10 @@ public class Trie implements ITrie {
     }
 
     public boolean add(String element) {
+        if (element == null) {
+            return false;
+        }
+
         if (contains(element)) {
             return false;
         }
@@ -90,6 +94,10 @@ public class Trie implements ITrie {
     }
 
     public boolean contains(String element) {
+        if (element == null) {
+            return false;
+        }
+
         return contains(element, 0, root);
     }
 
@@ -115,6 +123,10 @@ public class Trie implements ITrie {
     }
 
     public boolean remove(String element) {
+        if (element == null) {
+            return false;
+        }
+
         if (!contains(element)) {
             return false;
         }
@@ -152,6 +164,9 @@ public class Trie implements ITrie {
     }
 
     public int howManyStartsWithPrefix(String prefix) {
+        if (prefix == null) {
+            return 0;
+        }
         return howManyStartsWithPrefix(prefix, 0, root);
     }
 }
