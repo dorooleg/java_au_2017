@@ -1,23 +1,24 @@
-import com.sun.javaws.exceptions.InvalidArgumentException;
-
 /**
  * Created by user on 23.02.2017.
  */
 public class Trie implements ITrie {
 
-    private int size;
     private Node root;
     private final int COUNT_LATIN_SYMBOLS = 26;
     private final int MAX_COUNT_SYMBOLS = 26 * 2;
 
     private class Node {
+        Node() {
+            nodes = new Node[MAX_COUNT_SYMBOLS];
+            countWithPrefix = 0;
+            isTerminal = false;
+        }
         boolean isTerminal;
         int countWithPrefix;
         Node[] nodes;
     }
 
     Trie() {
-        size = 0;
         root = null;
     }
 
@@ -34,26 +35,25 @@ public class Trie implements ITrie {
     }
 
     private void insert(String element, int index, Node node) {
+
+        if (index == element.length()) {
+            node.isTerminal = true;
+            node.countWithPrefix++;
+            return;
+        }
+
         if (index >= element.length()) {
             return;
         }
 
-        if (node.nodes[getSymbolIndex(element.charAt(index))] == null) {
-            node.nodes[getSymbolIndex(element.charAt(index))]  = new Node();
-            node.nodes[getSymbolIndex(element.charAt(index))].nodes = new Node[MAX_COUNT_SYMBOLS];
-            node.nodes[getSymbolIndex(element.charAt(index))].countWithPrefix = 0;
-            node.nodes[getSymbolIndex(element.charAt(index))].isTerminal = false;
+        final int symbolIndex = getSymbolIndex(element.charAt(index));
+        if (node.nodes[symbolIndex] == null) {
+            node.nodes[symbolIndex]  = new Node();
         }
 
         node.countWithPrefix++;
 
-        if (index + 1 == element.length()) {
-            node.nodes[getSymbolIndex(element.charAt(index))].isTerminal = true;
-            node.nodes[getSymbolIndex(element.charAt(index))].countWithPrefix++;
-            return;
-        }
-
-        insert(element, index + 1, node.nodes[getSymbolIndex(element.charAt(index))]);
+        insert(element, index + 1, node.nodes[symbolIndex]);
     }
 
     public boolean add(String element) {
@@ -65,40 +65,35 @@ public class Trie implements ITrie {
             return false;
         }
 
-        if (root == null && element.length() != 0) {
+        //noinspection Since15
+        if (root == null && !element.isEmpty()) {
             root = new Node();
-            root.nodes = new Node[MAX_COUNT_SYMBOLS];
-            root.isTerminal = false;
-            root.countWithPrefix = 0;
         }
 
         insert(element,0, root);
-        size++;
         return true;
     }
 
     private boolean contains(String element, int index, Node node) {
+
         if (node == null) {
             return false;
+        }
+
+        if (index == element.length() && node.isTerminal) {
+            return true;
         }
 
         if (index >= element.length()) {
             return false;
         }
 
-        if (index + 1 == element.length() && node.nodes[getSymbolIndex(element.charAt(index))] != null && node.nodes[getSymbolIndex(element.charAt(index))].isTerminal) {
-            return true;
-        }
-
-        return contains(element, index + 1, node.nodes[getSymbolIndex(element.charAt(index))]);
+        final int symbolIndex = getSymbolIndex(element.charAt(index));
+        return contains(element, index + 1, node.nodes[symbolIndex]);
     }
 
     public boolean contains(String element) {
-        if (element == null) {
-            return false;
-        }
-
-        return contains(element, 0, root);
+        return element != null && contains(element, 0, root);
     }
 
     private void remove(String element, int index, Node node) {
@@ -106,19 +101,20 @@ public class Trie implements ITrie {
             return;
         }
 
+        final int symbolIndex = getSymbolIndex(element.charAt(index));
         if (index + 1 == element.length()) {
-            node.nodes[getSymbolIndex(element.charAt(index))].isTerminal = false;
-            node.nodes[getSymbolIndex(element.charAt(index))].countWithPrefix--;
-            if (node.nodes[getSymbolIndex(element.charAt(index))].countWithPrefix == 0) {
-                node.nodes[getSymbolIndex(element.charAt(index))] = null;
+            node.nodes[symbolIndex].isTerminal = false;
+            node.nodes[symbolIndex].countWithPrefix--;
+            if (node.nodes[symbolIndex].countWithPrefix == 0) {
+                node.nodes[symbolIndex] = null;
             }
             return;
         }
 
-        remove(element, index + 1, node.nodes[getSymbolIndex(element.charAt(index))]);
+        remove(element, index + 1, node.nodes[symbolIndex]);
         node.countWithPrefix--;
-        if (node.nodes[getSymbolIndex(element.charAt(index))].countWithPrefix == 0) {
-            node.nodes[getSymbolIndex(element.charAt(index))] = null;
+        if (node.nodes[symbolIndex].countWithPrefix == 0) {
+            node.nodes[symbolIndex] = null;
         }
     }
 
@@ -135,12 +131,11 @@ public class Trie implements ITrie {
         if (root.countWithPrefix == 0) {
             root = null;
         }
-        size--;
         return true;
     }
 
     public int size() {
-        return size;
+        return root == null ? 0 : root.countWithPrefix;
     }
 
     private int howManyStartsWithPrefix(String element, int index, Node node) {
@@ -148,7 +143,8 @@ public class Trie implements ITrie {
             return 0;
         }
 
-        if (element.length() == 0) {
+        //noinspection Since15
+        if (element.isEmpty()) {
             return root != null ? root.countWithPrefix : 0;
         }
 
@@ -156,11 +152,12 @@ public class Trie implements ITrie {
             return 0;
         }
 
-        if (index + 1 == element.length() && node.nodes[getSymbolIndex(element.charAt(index))] != null) {
-            return  node.nodes[getSymbolIndex(element.charAt(index))].countWithPrefix;
+        final int symbolIndex = getSymbolIndex(element.charAt(index));
+        if (index + 1 == element.length() && node.nodes[symbolIndex] != null) {
+            return  node.nodes[symbolIndex].countWithPrefix;
         }
 
-        return howManyStartsWithPrefix(element, index + 1, node.nodes[getSymbolIndex(element.charAt(index))]);
+        return howManyStartsWithPrefix(element, index + 1, node.nodes[symbolIndex]);
     }
 
     public int howManyStartsWithPrefix(String prefix) {
