@@ -9,6 +9,12 @@ import static junit.framework.Assert.*;
 
 public class TrieTest {
     @Test
+    public void testAbc() {
+        final Trie trie = new Trie();
+        assertFalse(trie.add(""));
+    }
+
+    @Test
     public void typicalTest1()
     {
         Trie trie = new Trie();

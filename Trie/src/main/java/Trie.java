@@ -57,15 +57,11 @@ public class Trie implements ITrie {
     }
 
     public boolean add(String element) {
-        if (element == null) {
+
+        if (element == null || element.isEmpty() || contains(element)) {
             return false;
         }
 
-        if (contains(element)) {
-            return false;
-        }
-
-        //noinspection Since15
         if (root == null && !element.isEmpty()) {
             root = new Node();
         }
