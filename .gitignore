@@ -1,0 +1,4 @@
+dictionary/.idea/*
+dictionary/*.iml
+dictionary/.gradle/*
+dictionary/build/classes/*
