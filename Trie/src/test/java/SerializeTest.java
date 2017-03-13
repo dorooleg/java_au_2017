@@ -1,23 +1,43 @@
-/**
- * Created by user on 23.02.2017.
- */
-
 import junit.framework.Assert;
 import org.junit.Test;
 
-import static junit.framework.Assert.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 
-public class TrieTest {
+import static junit.framework.Assert.assertFalse;
+
+/**
+ * Created by user on 13.03.2017.
+ */
+public class SerializeTest {
+
     @Test
-    public void testAbc() {
-        final Trie trie = new Trie();
+    public void testAbc() throws IOException {
+        Trie trie = new Trie();
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        trie.serialize(out);
+        ByteArrayInputStream is = new ByteArrayInputStream(out.toByteArray());
+        trie = new Trie();
+        trie.deserialize(is);
+
         assertFalse(trie.add(""));
     }
 
+
     @Test
-    public void typicalTest1() {
+    public void typicalTest1() throws IOException {
         Trie trie = new Trie();
         trie.add("Hello");
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        trie.serialize(out);
+        ByteArrayInputStream is = new ByteArrayInputStream(out.toByteArray());
+        trie = new Trie();
+        trie.deserialize(is);
+
         Assert.assertTrue(trie.contains("Hello"));
         Assert.assertFalse(trie.contains("Hell"));
         Assert.assertEquals(trie.size(), 1);
@@ -27,9 +47,16 @@ public class TrieTest {
     }
 
     @Test
-    public void typicalTest2() {
+    public void typicalTest2() throws IOException {
         Trie trie = new Trie();
         trie.add("Hello");
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        trie.serialize(out);
+        ByteArrayInputStream is = new ByteArrayInputStream(out.toByteArray());
+        trie = new Trie();
+        trie.deserialize(is);
+
         Assert.assertTrue(trie.contains("Hello"));
         Assert.assertEquals(trie.howManyStartsWithPrefix("Hell"), 1);
         Assert.assertEquals(trie.size(), 1);
@@ -39,26 +66,40 @@ public class TrieTest {
     }
 
     @Test
-    public void twoAdded() {
+    public void twoAdded() throws IOException {
         Trie trie = new Trie();
         trie.add("Hello");
         trie.add("Hello");
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        trie.serialize(out);
+        ByteArrayInputStream is = new ByteArrayInputStream(out.toByteArray());
+        trie = new Trie();
+        trie.deserialize(is);
+
         Assert.assertEquals(trie.size(), 1);
         Assert.assertEquals(trie.howManyStartsWithPrefix("Hell"), 1);
     }
 
     @Test
-    public void twoRemove() {
+    public void twoRemove() throws IOException {
         Trie trie = new Trie();
         trie.add("Hello");
         trie.remove("Hello");
         trie.remove("Hello");
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        trie.serialize(out);
+        ByteArrayInputStream is = new ByteArrayInputStream(out.toByteArray());
+        trie = new Trie();
+        trie.deserialize(is);
+
         Assert.assertEquals(trie.size(), 0);
         Assert.assertEquals(trie.howManyStartsWithPrefix("Hell"), 0);
     }
 
     @Test
-    public void bigDataTest() {
+    public void bigDataTest() throws IOException {
         Trie trie = new Trie();
         trie.add("Hello");
         trie.add("Hella");
@@ -66,6 +107,12 @@ public class TrieTest {
         trie.add("H");
         trie.add("Vas");
         trie.add("V");
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        trie.serialize(out);
+        ByteArrayInputStream is = new ByteArrayInputStream(out.toByteArray());
+        trie = new Trie();
+        trie.deserialize(is);
+
         Assert.assertTrue(trie.contains("Hello"));
         Assert.assertTrue(trie.contains("Hella"));
         Assert.assertTrue(trie.contains("Hel"));
@@ -89,7 +136,5 @@ public class TrieTest {
         trie.remove("V");
         Assert.assertEquals(trie.howManyStartsWithPrefix("V"), 1);
         Assert.assertFalse(trie.contains("V"));
-
     }
-
 }

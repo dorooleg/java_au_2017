@@ -1,25 +1,81 @@
+import java.io.*;
+
 /**
  * Created by user on 23.02.2017.
  */
-public class Trie implements ITrie {
+public class Trie implements ITrie, StreamSerializable {
 
     private Node root;
     private final int COUNT_LATIN_SYMBOLS = 26;
     private final int MAX_COUNT_SYMBOLS = 26 * 2;
 
-    private class Node {
-        Node() {
-            nodes = new Node[MAX_COUNT_SYMBOLS];
-            countWithPrefix = 0;
-            isTerminal = false;
-        }
-        boolean isTerminal;
-        int countWithPrefix;
-        Node[] nodes;
-    }
-
     Trie() {
         root = null;
+    }
+
+    @Override
+    public void serialize(OutputStream out) throws IOException {
+        DataOutputStream dataOutputStream = new DataOutputStream(out);
+        serialize(root, dataOutputStream);
+    }
+
+    public void serialize(Node node, DataOutputStream out) throws IOException {
+        if (node == null) {
+            return;
+        }
+
+        for (char ch = 'a'; ch <= 'z'; ch++) {
+            final int index = getSymbolIndex(ch);
+            if (node.nodes[index] != null) {
+                out.writeChar(ch);
+                serialize(node.nodes[index], out);
+            }
+        }
+
+        for (char ch = 'A'; ch <= 'Z'; ch++) {
+            final int index = getSymbolIndex(ch);
+            if (node.nodes[index] != null) {
+                out.writeChar(ch);
+                serialize(node.nodes[index], out);
+            }
+        }
+
+        out.writeChar('#');
+        out.writeBoolean(node.isTerminal);
+        out.writeInt(node.countWithPrefix);
+    }
+
+    @Override
+    public void deserialize(InputStream in) throws IOException {
+        root = null;
+        DataInputStream dataInputStream = new DataInputStream(in);
+        deserialize(root, dataInputStream);
+    }
+
+    public void deserialize(Node node, DataInputStream in) throws IOException {
+        try {
+            char ch = in.readChar();
+
+            if (root == null) {
+                root = new Node();
+                node = root;
+            }
+
+            while (ch != '#') {
+                final int index = getSymbolIndex(ch);
+                node.nodes[index] = new Node();
+                deserialize(node.nodes[index], in);
+                ch = in.readChar();
+            }
+
+            node.isTerminal = in.readBoolean();
+            node.countWithPrefix = in.readInt();
+        } catch (EOFException ex) {
+            //skip exception
+        } catch (IOException ex) {
+            root = null;
+            throw ex;
+        }
     }
 
     private int getSymbolIndex(char symbol) {
@@ -161,5 +217,16 @@ public class Trie implements ITrie {
             return 0;
         }
         return howManyStartsWithPrefix(prefix, 0, root);
+    }
+
+    private class Node {
+        Node() {
+            nodes = new Node[MAX_COUNT_SYMBOLS];
+            countWithPrefix = 0;
+            isTerminal = false;
+        }
+        boolean isTerminal;
+        int countWithPrefix;
+        Node[] nodes;
     }
 }
