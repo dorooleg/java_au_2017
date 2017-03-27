@@ -6,8 +6,8 @@ import java.io.*;
 public class Trie implements ITrie, StreamSerializable {
 
     private Node root;
-    private final int COUNT_LATIN_SYMBOLS = 26;
-    private final int MAX_COUNT_SYMBOLS = 26 * 2;
+    private final static int COUNT_LATIN_SYMBOLS = 26;
+    private final static int MAX_COUNT_SYMBOLS = 26 * 2;
 
     Trie() {
         root = null;
@@ -19,7 +19,7 @@ public class Trie implements ITrie, StreamSerializable {
         serialize(root, dataOutputStream);
     }
 
-    public void serialize(Node node, DataOutputStream out) throws IOException {
+    private void serialize(Node node, DataOutputStream out) throws IOException {
         if (node == null) {
             return;
         }
@@ -49,29 +49,26 @@ public class Trie implements ITrie, StreamSerializable {
     public void deserialize(InputStream in) throws IOException {
         root = null;
         DataInputStream dataInputStream = new DataInputStream(in);
+        root = new Node();
         deserialize(root, dataInputStream);
     }
 
-    public void deserialize(Node node, DataInputStream in) throws IOException {
+    private void deserialize(Node node, DataInputStream in) throws IOException {
         try {
-            char ch = in.readChar();
+            if (in.available() > 0)
+            {
+                char ch = in.readChar();
 
-            if (root == null) {
-                root = new Node();
-                node = root;
+                while (ch != '#') {
+                    final int index = getSymbolIndex(ch);
+                    node.nodes[index] = new Node();
+                    deserialize(node.nodes[index], in);
+                    ch = in.readChar();
+                }
+
+                node.isTerminal = in.readBoolean();
+                node.countWithPrefix = in.readInt();
             }
-
-            while (ch != '#') {
-                final int index = getSymbolIndex(ch);
-                node.nodes[index] = new Node();
-                deserialize(node.nodes[index], in);
-                ch = in.readChar();
-            }
-
-            node.isTerminal = in.readBoolean();
-            node.countWithPrefix = in.readInt();
-        } catch (EOFException ex) {
-            //skip exception
         } catch (IOException ex) {
             root = null;
             throw ex;
@@ -219,14 +216,15 @@ public class Trie implements ITrie, StreamSerializable {
         return howManyStartsWithPrefix(prefix, 0, root);
     }
 
-    private class Node {
+   static  private class Node {
+       boolean isTerminal;
+       int countWithPrefix;
+       final Node[] nodes;
+
         Node() {
             nodes = new Node[MAX_COUNT_SYMBOLS];
             countWithPrefix = 0;
             isTerminal = false;
         }
-        boolean isTerminal;
-        int countWithPrefix;
-        Node[] nodes;
     }
 }

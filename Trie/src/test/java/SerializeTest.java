@@ -1,12 +1,9 @@
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
-
-import static junit.framework.Assert.assertFalse;
 
 /**
  * Created by user on 13.03.2017.
@@ -22,8 +19,7 @@ public class SerializeTest {
         ByteArrayInputStream is = new ByteArrayInputStream(out.toByteArray());
         trie = new Trie();
         trie.deserialize(is);
-
-        assertFalse(trie.add(""));
+        Assert.assertFalse(trie.add(""));
     }
 
 
@@ -40,9 +36,9 @@ public class SerializeTest {
 
         Assert.assertTrue(trie.contains("Hello"));
         Assert.assertFalse(trie.contains("Hell"));
-        Assert.assertEquals(trie.size(), 1);
+        Assert.assertEquals(1, trie.size());
         trie.remove("Hello");
-        Assert.assertEquals(trie.size(), 0);
+        Assert.assertEquals(0, trie.size());
         Assert.assertFalse(trie.contains("Hello"));
     }
 
@@ -58,11 +54,11 @@ public class SerializeTest {
         trie.deserialize(is);
 
         Assert.assertTrue(trie.contains("Hello"));
-        Assert.assertEquals(trie.howManyStartsWithPrefix("Hell"), 1);
-        Assert.assertEquals(trie.size(), 1);
+        Assert.assertEquals(1, trie.howManyStartsWithPrefix("Hell"));
+        Assert.assertEquals(1, trie.size());
         trie.remove("Hello");
-        Assert.assertEquals(trie.size(), 0);
-        Assert.assertEquals(trie.howManyStartsWithPrefix("Hell"), 0);
+        Assert.assertEquals(0, trie.size());
+        Assert.assertEquals(0, trie.howManyStartsWithPrefix("Hell"));
     }
 
     @Test
@@ -77,8 +73,8 @@ public class SerializeTest {
         trie = new Trie();
         trie.deserialize(is);
 
-        Assert.assertEquals(trie.size(), 1);
-        Assert.assertEquals(trie.howManyStartsWithPrefix("Hell"), 1);
+        Assert.assertEquals(1, trie.size());
+        Assert.assertEquals(1, trie.howManyStartsWithPrefix("Hell"));
     }
 
     @Test
@@ -94,8 +90,8 @@ public class SerializeTest {
         trie = new Trie();
         trie.deserialize(is);
 
-        Assert.assertEquals(trie.size(), 0);
-        Assert.assertEquals(trie.howManyStartsWithPrefix("Hell"), 0);
+        Assert.assertEquals(0, trie.size());
+        Assert.assertEquals(0, trie.howManyStartsWithPrefix("Hell"));
     }
 
     @Test
@@ -126,15 +122,15 @@ public class SerializeTest {
         Assert.assertFalse(trie.contains("Ha"));
         Assert.assertFalse(trie.contains("Tha"));
 
-        Assert.assertEquals(trie.size(), 6);
-        Assert.assertEquals(trie.howManyStartsWithPrefix("Hell"), 2);
+        Assert.assertEquals(6, trie.size());
+        Assert.assertEquals(2, trie.howManyStartsWithPrefix("Hell"));
 
         trie.remove("Hel");
-        Assert.assertEquals(trie.howManyStartsWithPrefix("Hel"), 2);
+        Assert.assertEquals(2, trie.howManyStartsWithPrefix("Hel"));
         Assert.assertFalse(trie.contains("Hel"));
 
         trie.remove("V");
-        Assert.assertEquals(trie.howManyStartsWithPrefix("V"), 1);
+        Assert.assertEquals(1, trie.howManyStartsWithPrefix("V"));
         Assert.assertFalse(trie.contains("V"));
     }
 }
