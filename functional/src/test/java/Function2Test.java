@@ -12,6 +12,7 @@ public class Function2Test {
         Function2<Double, Double, Double> sum = (a, b) -> a + b;
         Function1<Double, Integer> mul2 = value -> value.intValue() << 1;
         assertEquals(6, sum.compose(mul2).apply(1.0, 2.0).intValue());
+
         Function1<Object, Integer> toInteger = x -> ((Double)x).intValue();
         assertEquals(new Integer(2), sum.compose(toInteger).apply(1.2, 1.3));
     }
@@ -21,6 +22,7 @@ public class Function2Test {
         Function2<Integer, Integer, Integer> div = (a, b) -> a / b;
         Function1<Integer, Integer> div80 = div.bind1(80);
         assertEquals(20, div80.apply(4).intValue());
+
     }
 
     @Test

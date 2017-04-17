@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public final class Collections {
+public class Collections {
 
     private Collections() {
     }

@@ -11,19 +11,19 @@ public interface Predicate<T> {
 
     default Predicate<T> and(Predicate<? super T> other) {
         if (other == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
-        return (t) -> test(t) && other.test(t);
+        return t -> test(t) && other.test(t);
     }
 
     default Predicate<T> or(Predicate<? super T> other) {
         if (other == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
         return (t) -> test(t) || other.test(t);
     }
 
     default Predicate<T> not() {
-        return (t) -> !test(t);
+        return t -> !test(t);
     }
 }

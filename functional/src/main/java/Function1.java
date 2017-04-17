@@ -7,9 +7,9 @@ public interface Function1<T, R> {
 
     default <P> Function1<T, P> compose(Function1<? super R, ? extends P> g) {
         if (g == null) {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
-        return (T v) -> g.apply(apply(v));
+        return v -> g.apply(apply(v));
     }
 
 }
