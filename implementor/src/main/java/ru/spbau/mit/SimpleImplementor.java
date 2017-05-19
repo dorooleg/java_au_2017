@@ -10,6 +10,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Oleg on 5/18/2017.
@@ -104,21 +106,25 @@ public class SimpleImplementor implements Implementor {
 
     private StringBuilder createMethods(Class<?> clazz) {
         StringBuilder text = new StringBuilder();
+        Set<StringBuilder> set = new HashSet<>();
         while (clazz != null) {
 
             for (Method method : clazz.getDeclaredMethods()) {
                 if (Modifier.isAbstract(method.getModifiers())) {
-                    text.append(createMethod(method));
+                    set.add(createMethod(method));
                 }
             }
 
             for (Class<?> interfaceClass : clazz.getInterfaces()) {
                 for (Method method : interfaceClass.getDeclaredMethods()) {
-                    text.append(createMethod(method));
+                    set.add(createMethod(method));
                 }
             }
 
             clazz = clazz.getSuperclass();
+        }
+        for (StringBuilder method : set) {
+            text.append(method);
         }
         return text;
     }
